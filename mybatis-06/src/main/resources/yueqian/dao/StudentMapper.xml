@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--configuration 核心配置文件-->
+<mapper namespace="yueqian.dao.StudentMapper">
+    <!--按照查询嵌套处理-->
+    <select id="getStudent" resultMap="StudentTeacher">
+        /*select s.id, s.name, t.name from student s,teacher t where s.tid = t.id*/
+        select * from student
+    </select>
+    <resultMap id="StudentTeacher" type="yueqian.pojo.Student">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <!--
+        复杂情况单独处理
+        对象：association
+        集合：collection
+        -->
+        <association property="teacher" column="tid" javaType="yueqian.pojo.Teacher" select="getTeacher"/>
+    </resultMap>
+    
+    <select id="getTeacher" resultType="yueqian.pojo.Teacher">
+        select * from teacher where id = #{id}
+    </select>
+
+    <!--按照结果嵌套处理-->
+    <select id="getStudent2" resultMap="StudentTeacher2">
+        select s.id sid, s.name sname, t.name tname from student s,teacher t where s.tid = t.id
+    </select>
+    <resultMap id="StudentTeacher2" type="yueqian.pojo.Student">
+        <result property="id" column="sid"/>
+        <result property="name" column="sname"/>
+        <association property="teacher" javaType="yueqian.pojo.Teacher">
+            <result property="name" column="tname"/>
+        </association>
+    </resultMap>
+    
+
+</mapper>

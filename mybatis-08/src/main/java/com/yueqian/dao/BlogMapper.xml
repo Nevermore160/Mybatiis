@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.yueqian.dao.BlogMapper">
+
+    <sql id="if_title_author">
+        <if test="title != null">
+            and title = #{title}
+        </if>
+        <if test="author != null">
+            and author = #{author}
+        </if>
+    </sql>
+
+    <select id="queryBlogIF" parameterType="map" resultType="com.yueqian.pojo.Blog">
+        select * from blog
+        <where>
+            <include refid="if_title_author"></include>
+        </where>
+    </select>
+    
+    <select id="queryBlogChoose" parameterType="map" resultType="com.yueqian.pojo.Blog">
+        select * from blog
+        <where>
+        /*choose相当于switch case 如果有一个满足了，不会继续向下执行了*/
+            <choose>
+                <when test="title != null">
+                    title = #{title}
+                </when>
+                <when test="author != null">
+                    and autor = #{author}
+                </when>
+                <otherwise>
+                    and views = #{views}
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <update id="updateBlog" parameterType="map">
+        update blog
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="author != null">
+                author = #{author}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--可以传递一个万能的map，这个map中可以存在一个集合-->
+    <select id="queryBlogForeach" parameterType="map" resultType="com.yueqian.pojo.Blog">
+        select * from blog
+        <where>
+            <foreach collection="ids" item="id" open="(" close=")" separator="or">
+                id = #{id}
+            </foreach>
+        </where>
+    </select>
+</mapper>
